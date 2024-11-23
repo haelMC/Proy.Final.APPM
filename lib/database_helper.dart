@@ -21,7 +21,7 @@ class DatabaseHelper {
     String path = join(await getDatabasesPath(), 'trabajos.db');
     return await openDatabase(
       path,
-      version: 4, // Incrementa la versión según los cambios
+      version: 4,
       onCreate: (db, version) async {
         // Crear tabla trabajos
         await db.execute('''
@@ -56,9 +56,8 @@ class DatabaseHelper {
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 4) {
+          // Modificación de tablas o nuevas tablas en versiones superiores
           await db.execute('ALTER TABLE trabajos ADD COLUMN categoriaId INTEGER NOT NULL DEFAULT 0');
-        }
-        if (oldVersion < 4) {
           await db.execute('''
             CREATE TABLE IF NOT EXISTS categorias (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -79,22 +78,21 @@ class DatabaseHelper {
   Future<List<Trabajo>> getTrabajos() async {
     final db = await database;
     final List<Map<String, dynamic>> result = await db.rawQuery('''
-    SELECT 
-      trabajos.id, 
-      trabajos.descripcion, 
-      trabajos.imagen, 
-      trabajos.salario, 
-      trabajos.empresaId, 
-      trabajos.categoriaId,
-      empresas.nombre AS empresaNombre,
-      categorias.nombre AS categoriaNombre
-    FROM trabajos
-    LEFT JOIN empresas ON trabajos.empresaId = empresas.id
-    LEFT JOIN categorias ON trabajos.categoriaId = categorias.id
-  ''');
+      SELECT 
+        trabajos.id, 
+        trabajos.descripcion, 
+        trabajos.imagen, 
+        trabajos.salario, 
+        trabajos.empresaId, 
+        trabajos.categoriaId,
+        empresas.nombre AS empresaNombre,
+        categorias.nombre AS categoriaNombre
+      FROM trabajos
+      LEFT JOIN empresas ON trabajos.empresaId = empresas.id
+      LEFT JOIN categorias ON trabajos.categoriaId = categorias.id
+    ''');
     return result.map((map) => Trabajo.fromMap(map)).toList();
   }
-
 
   Future<int> updateTrabajo(Trabajo trabajo) async {
     final db = await database;
