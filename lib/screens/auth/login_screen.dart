@@ -3,6 +3,7 @@ import 'package:appmovil/models/roles.dart';
 import 'package:appmovil/screens/roles/admin/admin_home_screen.dart';
 import 'package:appmovil/screens/roles/user/user_home_screen.dart';
 import 'package:appmovil/screens/roles/guest/guest_home_screen.dart';
+import 'package:appmovil/screens/roles/empresa/empresa_home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -13,24 +14,40 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  // Ejemplo de credenciales para pruebas (modificar según necesidad)
+  final int adminId = 1;
+  final int userId = 2;
+  final int empresaId = 3;
+
   void handleLogin() {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
-    if (email == DefaultCredentials.adminEmail && password == DefaultCredentials.adminPassword) {
-      // Credenciales de administrador
+    if (email == DefaultCredentials.adminEmail &&
+        password == DefaultCredentials.adminPassword) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => AdminHomeScreen()),
+        MaterialPageRoute(
+          builder: (context) => AdminHomeScreen(),
+        ),
       );
-    } else if (email == DefaultCredentials.userEmail && password == DefaultCredentials.userPassword) {
-      // Credenciales de usuario
+    } else if (email == DefaultCredentials.userEmail &&
+        password == DefaultCredentials.userPassword) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => UserHomeScreen()),
+        MaterialPageRoute(
+          builder: (context) => UserHomeScreen(userId: userId),
+        ),
       );
-    } else {
-      // Credenciales incorrectas
+    } else if (email == DefaultCredentials.empresaEmail && password == DefaultCredentials.empresaPassword) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EmpresaHomeScreen(empresaId: empresaId), // Pasa el empresaId aquí
+        ),
+      );
+    }
+    else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Correo o contraseña incorrectos"),

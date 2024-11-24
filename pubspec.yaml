@@ -19,6 +19,7 @@ dependencies:
 
   # Iconos de Cupertino
   cupertino_icons: ^1.0.8
+  image_picker: ^0.8.6
 
 dev_dependencies:
   flutter_test:
