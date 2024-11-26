@@ -22,10 +22,14 @@ class _UserApplicationsScreenState extends State<UserApplicationsScreen> {
   }
 
   Future<void> _cargarPostulaciones() async {
-    final postulaciones = await _dbHelper.getPostulacionesByUserId(widget.userId);
-    setState(() {
-      _postulaciones = postulaciones;
-    });
+    try {
+      final postulaciones = await _dbHelper.getPostulacionesByUserId(widget.userId);
+      setState(() {
+        _postulaciones = postulaciones;
+      });
+    } catch (e) {
+      print('Error cargando postulaciones: $e');
+    }
   }
 
   @override
@@ -33,12 +37,13 @@ class _UserApplicationsScreenState extends State<UserApplicationsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Mis Postulaciones'),
+        backgroundColor: Colors.blueAccent, // Cambia el color del AppBar si lo deseas
       ),
       body: _postulaciones.isEmpty
           ? Center(
         child: Text(
           'No tienes postulaciones aún.',
-          style: TextStyle(fontSize: 18),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       )
           : ListView.builder(
@@ -47,12 +52,38 @@ class _UserApplicationsScreenState extends State<UserApplicationsScreen> {
           final postulacion = _postulaciones[index];
           return Card(
             margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            elevation: 5,
             child: ListTile(
-              title: Text(postulacion.trabajoId.toString()), // Muestra el ID del trabajo
+              contentPadding: EdgeInsets.all(16),
+              title: Text(
+                'Trabajo ID: ${postulacion.trabajoId}',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Fecha: ${postulacion.fechaPostulacion}'),
+                  SizedBox(height: 5),
+                  Text('Fecha: ${postulacion.fechaPostulacion}', style: TextStyle(fontSize: 16)),
+                  SizedBox(height: 8),
+                  // Mostrar el estado "Pendiente" para cada postulación
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.orangeAccent,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      'Pendiente',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

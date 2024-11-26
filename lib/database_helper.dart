@@ -112,6 +112,24 @@ class DatabaseHelper {
     return result.map((map) => Trabajo.fromMap(map)).toList();
   }
 
+  Future<Trabajo?> getTrabajoById(int id) async {
+    final db = await database; // Asegúrate de que la base de datos esté inicializada
+    final result = await db.query(
+      'trabajos', // Nombre de la tabla de trabajos
+      where: 'id = ?', // Condición para filtrar por ID
+      whereArgs: [id],
+    );
+
+    if (result.isNotEmpty) {
+      return Trabajo.fromMap(result.first); // Convierte el primer resultado en un objeto Trabajo
+    } else {
+      return null; // Retorna null si no encuentra el trabajo
+    }
+  }
+
+
+
+
   // ********** CRUD para Empresas **********
   Future<int> insertEmpresa(Empresa empresa) async {
     final db = await database;
@@ -180,46 +198,27 @@ class DatabaseHelper {
   ''');
   }
 
-  Future<int> insertPostulacion(Postulacion postulacion) async {
+  Future<void> insertPostulacion(Postulacion postulacion) async {
     final db = await database;
-    try {
-      return await db.insert('postulaciones', postulacion.toMap());
-    } catch (e) {
-      print('Error al insertar postulación: $e');
-      return -1; // Si ocurre un error, retorna -1
-    }
+    await db.insert(
+      'postulaciones',
+      postulacion.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
-
 
   Future<List<Postulacion>> getPostulacionesByUserId(int userId) async {
     final db = await database;
-    final List<Map<String, dynamic>> result = await db.rawQuery('''
-    SELECT 
-      p.id AS id,
-      t.id AS trabajoId,
-      t.descripcion AS trabajoDescripcion,
-      t.salario AS trabajoSalario,
-      t.imagen AS trabajoImagen,
-      t.empresaId AS empresaId,
-      e.nombre AS empresaNombre,
-      c.nombre AS categoriaNombre,
-      p.fechaPostulacion AS fechaPostulacion
-    FROM postulaciones p
-    INNER JOIN trabajos t ON p.trabajoId = t.id
-    LEFT JOIN empresas e ON t.empresaId = e.id
-    LEFT JOIN categorias c ON t.categoriaId = c.id
-    WHERE p.userId = ?
-  ''', [userId]);
-
-    // Validar resultados
-    for (final row in result) {
-      if (row['trabajoId'] == null || row['userId'] == null) {
-        print('Error: fila con datos nulos -> $row');
-      }
-    }
-
-
-    return result.map((map) => Postulacion.fromMap(map)).toList();
+    final List<Map<String, dynamic>> maps = await db.query(
+      'postulaciones',
+      where: 'userId = ?',
+      whereArgs: [userId],
+    );
+    return List.generate(maps.length, (i) {
+      return Postulacion.fromMap(maps[i]);
+    });
   }
+
+
 
 }

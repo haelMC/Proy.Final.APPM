@@ -22,14 +22,14 @@ class Trabajo {
   // Método para convertir un mapa en un objeto Trabajo
   factory Trabajo.fromMap(Map<String, dynamic> map) {
     return Trabajo(
-      id: map['id'],
-      descripcion: map['descripcion'],
-      imagen: map['imagen'],
-      salario: map['salario'],
-      empresaId: map['empresaId'],
-      categoriaId: map['categoriaId'],
-      empresaNombre: map['empresaNombre'],
-      categoriaNombre: map['categoriaNombre'],
+      id: map['id'] as int?,
+      descripcion: map['descripcion'] as String,
+      imagen: map['imagen'] as String,
+      salario: map['salario'] as double,
+      empresaId: map['empresaId'] as int,
+      categoriaId: map['categoriaId'] as int,
+      empresaNombre: map['empresaNombre'] as String?,
+      categoriaNombre: map['categoriaNombre'] as String?,
     );
   }
 
@@ -42,6 +42,7 @@ class Trabajo {
       'salario': salario,
       'empresaId': empresaId,
       'categoriaId': categoriaId,
+      // No se incluyen campos opcionales en la salida de toMap() porque son calculados o mostrados
     };
   }
 }

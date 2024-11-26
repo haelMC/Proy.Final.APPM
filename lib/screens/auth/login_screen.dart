@@ -1,9 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:appmovil/models/roles.dart';
 import 'package:appmovil/screens/roles/admin/admin_home_screen.dart';
 import 'package:appmovil/screens/roles/user/user_home_screen.dart';
 import 'package:appmovil/screens/roles/guest/guest_home_screen.dart';
 import 'package:appmovil/screens/roles/empresa/empresa_home_screen.dart';
+
+// Clase para almacenar las credenciales predeterminadas (puedes cambiar según tus necesidades)
+class DefaultCredentials {
+  static const Map<String, String> admin = {
+    'email': "admin@gmail.com",
+    'password': "12345678"
+  };
+
+  static const Map<String, String> user = {
+    'email': "user@gmail.com",
+    'password': "12345678"
+  };
+
+  static const Map<String, String> empresa = {
+    'email': "empresa@gmail.com",
+    'password': "12345678"
+  };
+}
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -14,85 +31,162 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  // Ejemplo de credenciales para pruebas (modificar según necesidad)
+  // IDs de ejemplo para roles
   final int adminId = 1;
   final int userId = 2;
   final int empresaId = 3;
 
+  // Método para manejar el inicio de sesión
   void handleLogin() {
-    final email = emailController.text.trim();
-    final password = passwordController.text.trim();
+    final String email = emailController.text.trim();
+    final String password = passwordController.text.trim();
 
-    if (email == DefaultCredentials.adminEmail &&
-        password == DefaultCredentials.adminPassword) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AdminHomeScreen(),
-        ),
-      );
-    } else if (email == DefaultCredentials.userEmail &&
-        password == DefaultCredentials.userPassword) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => UserHomeScreen(userId: userId),
-        ),
-      );
-    } else if (email == DefaultCredentials.empresaEmail && password == DefaultCredentials.empresaPassword) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => EmpresaHomeScreen(empresaId: empresaId), // Pasa el empresaId aquí
-        ),
-      );
+    if (email.isEmpty || password.isEmpty) {
+      _showError("Por favor, ingresa tu correo y contraseña.");
+      return;
     }
-    else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Correo o contraseña incorrectos"),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 3),
-        ),
-      );
+
+    // Validación de credenciales
+    if (email == DefaultCredentials.admin['email'] &&
+        password == DefaultCredentials.admin['password']) {
+      _navigateTo(AdminHomeScreen());
+    } else if (email == DefaultCredentials.user['email'] &&
+        password == DefaultCredentials.user['password']) {
+      _navigateTo(UserHomeScreen(userId: userId));
+    } else if (email == DefaultCredentials.empresa['email'] &&
+        password == DefaultCredentials.empresa['password']) {
+      _navigateTo(EmpresaHomeScreen(empresaId: empresaId));
+    } else {
+      _showError("Correo o contraseña incorrectos");
     }
+  }
+
+  // Método para mostrar errores en un SnackBar
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
+      ),
+    );
+  }
+
+  // Método para navegar a la pantalla correspondiente
+  void _navigateTo(Widget screen) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => screen),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Inicio de Sesión")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: emailController,
-              decoration: InputDecoration(labelText: 'Correo Electrónico'),
+      backgroundColor: Colors.blueAccent, // Fondo azul principal
+      body: Center(
+        child: Container(
+          margin: EdgeInsets.symmetric(horizontal: 20),
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white, // Fondo blanco para el formulario
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 10,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Título "Bolsa Laboral" encima de la imagen
+                Text(
+                  "Bolsa Laboral",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blueAccent,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 10),
+
+                // Imagen decorativa
+                Image.asset(
+                  'assets/logo1.png',
+                  height: 150, // Altura de la imagen
+                ),
+                SizedBox(height: 20),
+
+                // Campo de correo electrónico
+                TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.email),
+                    labelText: 'Correo Electrónico',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 15),
+
+                // Campo de contraseña
+                TextField(
+                  controller: passwordController,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.lock),
+                    labelText: 'Contraseña',
+                    border: OutlineInputBorder(),
+                  ),
+                  obscureText: true, // Ocultar texto para contraseña
+                ),
+                SizedBox(height: 20),
+
+                // Botón de inicio de sesión
+                ElevatedButton(
+                  onPressed: handleLogin,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 50),
+                    backgroundColor: Colors.blueAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Text(
+                    "Iniciar Sesión",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+                SizedBox(height: 20),
+
+                // Texto para continuar como invitado
+                Text(
+                  "O continúa como invitado",
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+                SizedBox(height: 10),
+
+                // Botón para invitado
+                ElevatedButton(
+                  onPressed: () => _navigateTo(GuestHomeScreen()),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 50),
+                    backgroundColor: Colors.grey,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Text(
+                    "Ingresar como Invitado",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+              ],
             ),
-            TextField(
-              controller: passwordController,
-              decoration: InputDecoration(labelText: 'Contraseña'),
-              obscureText: true,
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: handleLogin,
-              child: Text("Iniciar Sesión"),
-            ),
-            SizedBox(height: 20),
-            Text("O continúa como invitado"),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => GuestHomeScreen()),
-                );
-              },
-              child: Text("Ingresar como Invitado"),
-            ),
-          ],
+          ),
         ),
       ),
     );

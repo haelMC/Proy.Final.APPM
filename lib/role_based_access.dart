@@ -1,6 +1,8 @@
 // role_based_access.dart
 import 'package:flutter/material.dart';
 
+import 'models/roles.dart';
+
 class RoleBasedAccess extends StatelessWidget {
   final String userRole;
   final String requiredRole;

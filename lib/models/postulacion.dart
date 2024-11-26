@@ -11,21 +11,22 @@ class Postulacion {
     required this.fechaPostulacion,
   });
 
+  // Constructor para crear un objeto desde un mapa
+  factory Postulacion.fromMap(Map<String, dynamic> map) {
+    return Postulacion(
+      id: map['id'],
+      trabajoId: map['trabajoId'],
+      userId: map['userId'],
+      fechaPostulacion: map['fechaPostulacion'],
+    );
+  }
+
+  // Convertir objeto a mapa para insertar en la base de datos
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
       'trabajoId': trabajoId,
       'userId': userId,
       'fechaPostulacion': fechaPostulacion,
     };
-  }
-
-  factory Postulacion.fromMap(Map<String, dynamic> map) {
-    return Postulacion(
-      id: map['id'] as int?, // Permitir que sea nulo
-      trabajoId: map['trabajoId'] as int, // Campo obligatorio
-      userId: map['userId'] as int, // Campo obligatorio
-      fechaPostulacion: map['fechaPostulacion'] ?? '', // Valor predeterminado si es nulo
-    );
   }
 }
